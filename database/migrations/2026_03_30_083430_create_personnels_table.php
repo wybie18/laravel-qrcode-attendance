@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone_number')->nullable();
             $table->string('qr_code')->unique()->nullable();
-            $table->foreignId('company_id')->constrained()->onDelete('cascade');
+            $table->foreignId('office_id')->constrained()->onDelete('cascade');
             $table->foreignId('position_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
