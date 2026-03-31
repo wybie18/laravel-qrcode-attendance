@@ -14,16 +14,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'email',
     'phone_number',
     'qr_code',
-    'company_id',
+    'office_id',
     'position_id',
 ])]
 class Personnel extends Model
 {
     use HasFactory;
 
-    public function company(): BelongsTo
+    public function office(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Office::class);
     }
 
     public function position(): BelongsTo
