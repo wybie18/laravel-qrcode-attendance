@@ -6,13 +6,15 @@ declare global {
     }
 }
 
-window.axios = axios;
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.withCredentials = true;
 
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.withCredentials = true;
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    
+    window.axios = axios;
+    const token = document.head.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
 
-const token = document.head.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
-
-if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+    if (token) {
+        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+    }
 }

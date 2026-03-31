@@ -34,6 +34,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Spinner } from '@/components/ui/spinner';
 import type { PersonnelPageProps, Personnel } from '@/types/personnel';
 import { fullName } from '@/utils';
 import { index as personnelsIndex } from '@/routes/personnels';
@@ -46,6 +47,7 @@ const createDialogOpen = shallowRef(false);
 const showDialogOpen = shallowRef(false);
 const editDialogOpen = shallowRef(false);
 const deleteDialogOpen = shallowRef(false);
+const isDownloadingQr = shallowRef(false);
 
 const selectedPersonnel = shallowRef<Personnel | null>(null);
 
@@ -86,9 +88,46 @@ function openDeleteDialog(personnel: Personnel): void {
     deleteDialogOpen.value = true;
 }
 
-function downloadQrCode(): void {
+async function downloadQrCode(): Promise<void> {
     if (!selectedPersonnel.value || !selectedPersonnel.value.qr_code) {
         return;
+    }
+
+    isDownloadingQr.value = true;
+
+    try {
+        const response = await axios.post('/qr-code/download', { 
+            qr_data: selectedPersonnel.value.qr_code,
+            filename: `qr-${selectedPersonnel.value.last_name}-${selectedPersonnel.value.id}`,
+        }, {
+            responseType: 'blob',
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        const link = document.createElement('a');
+        link.href = url;
+
+        const contentDisposition = response.headers['content-disposition'];
+        let fileName = 'downloaded-qr.png';
+        if (contentDisposition) {
+            const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            if (fileNameMatch && fileNameMatch.length === 2) {
+                fileName = fileNameMatch[1];
+            }
+        }
+        
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        
+        // 4. Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error downloading QR code:', error);
+    } finally {
+        isDownloadingQr.value = false;
     }
 }
 
@@ -234,10 +273,11 @@ defineOptions({
                             class="mt-3"
                             size="sm"
                             variant="outline"
-                            :disabled="!selectedPersonnel.qr_code"
+                            :disabled="!selectedPersonnel.qr_code || isDownloadingQr"
                             @click="downloadQrCode"
                         >
-                            Download QR
+                            <Spinner v-if="isDownloadingQr" class="mr-2" />
+                            {{ isDownloadingQr ? 'Downloading...' : 'Download QR' }}
                         </Button>
 
                      </div>
