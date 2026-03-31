@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use F9WebLtd\QrCode\Facades\QrCode;
-use Illuminate\Support\Str;
 
 class QrCodeService
 {
