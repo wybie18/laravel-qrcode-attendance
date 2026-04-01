@@ -27,6 +27,7 @@ import EditPositionDialog from '@/pages/positions/components/EditPositionDialog.
 import CreatePositionDialog from '@/pages/positions/components/CreatePositionDialog.vue';
 import ImportPositionsDialog from '@/pages/positions/components/ImportPositionsDialog.vue';
 import type { PositionPageProps, Position } from '@/types/position';
+import { index as positionsIndex } from '@/routes/positions';
 
 const props = defineProps<PositionPageProps>();
 
@@ -66,6 +67,17 @@ function openDeleteDialog(position: Position): void {
     selectedPosition.value = position;
     deleteDialogOpen.value = true;
 }
+
+defineOptions({
+    layout: {
+        breadcrumbs: [
+            {
+                title: 'Positions',
+                href: positionsIndex(),
+            },
+        ],
+    },
+});
 
 </script>
 
