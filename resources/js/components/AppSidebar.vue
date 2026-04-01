@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
+import { index as attendanceLogIndex } from '@/routes/attendance-logs';
 import { index as personnelIndex } from '@/routes/personnels';
 import { index as officeIndex } from '@/routes/offices';
 import { index as positionIndex } from '@/routes/positions'
@@ -28,7 +29,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Attendance',
-        href: '#',
+        href: attendanceLogIndex(),
         icon: BookCheck,
     },
     {
