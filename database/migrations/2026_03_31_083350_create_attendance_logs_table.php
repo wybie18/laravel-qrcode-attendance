@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('attendance_logs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('personnel_id')->constrained('personnels')->cascadeOnDelete();
             $table->date('log_date');
-            $table->time('time_in');
+            $table->time('time_in')->nullable();
             $table->time('time_out')->nullable();
             $table->timestamps();
         });
