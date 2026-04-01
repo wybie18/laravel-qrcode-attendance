@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { computed, shallowRef } from 'vue';
-import { index } from '@/actions/App/Http/Controllers/PositionController';
+import { exportMethod, index } from '@/actions/App/Http/Controllers/PositionController';
 import { Button } from '@/components/ui/button';
 import {
     Pagination,
@@ -25,11 +25,13 @@ import {
 import DeletePositionDialog from '@/pages/positions/components/DeletePositionDialog.vue';
 import EditPositionDialog from '@/pages/positions/components/EditPositionDialog.vue';
 import CreatePositionDialog from '@/pages/positions/components/CreatePositionDialog.vue';
+import ImportPositionsDialog from '@/pages/positions/components/ImportPositionsDialog.vue';
 import type { PositionPageProps, Position } from '@/types/position';
 
 const props = defineProps<PositionPageProps>();
 
 const createDialogOpen = shallowRef(false);
+const importDialogOpen = shallowRef(false);
 const editDialogOpen = shallowRef(false);
 const deleteDialogOpen = shallowRef(false);
 
@@ -79,7 +81,13 @@ function openDeleteDialog(position: Position): void {
                 </p>
             </div>
 
-            <CreatePositionDialog v-model:open="createDialogOpen" />
+            <div class="flex items-center gap-2">
+                <Button as-child variant="outline">
+                    <a :href="exportMethod.url()">Export Excel</a>
+                </Button>
+                <ImportPositionsDialog v-model:open="importDialogOpen" />
+                <CreatePositionDialog v-model:open="createDialogOpen" />
+            </div>
         </div>
 
         <div class="rounded-xl border border-sidebar-border/70">

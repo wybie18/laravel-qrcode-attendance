@@ -15,6 +15,13 @@ Route::inertia('/', 'Welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 
+    Route::get('positions/export', [PositionController::class, 'export'])
+        ->name('positions.export');
+    Route::get('positions/template', [PositionController::class, 'template'])
+        ->name('positions.template');
+    Route::post('positions/import', [PositionController::class, 'import'])
+        ->name('positions.import');
+
     Route::resources([
         'positions' => PositionController::class,
         'offices' => OfficeController::class,
