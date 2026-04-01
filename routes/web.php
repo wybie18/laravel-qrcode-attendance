@@ -21,12 +21,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('positions.template');
     Route::post('positions/import', [PositionController::class, 'import'])
         ->name('positions.import');
-        Route::get('offices/export', [OfficeController::class, 'exportMethod'])
-            ->name('offices.export');
-        Route::get('offices/template', [OfficeController::class, 'template'])
-            ->name('offices.template');
-        Route::post('offices/import', [OfficeController::class, 'importMethod'])
-            ->name('offices.import');
+    Route::get('offices/export', [OfficeController::class, 'exportMethod'])
+        ->name('offices.export');
+    Route::get('offices/template', [OfficeController::class, 'template'])
+        ->name('offices.template');
+    Route::post('offices/import', [OfficeController::class, 'importMethod'])
+        ->name('offices.import');
+    Route::get('personnels/export', [PersonnelController::class, 'exportMethod'])
+        ->name('personnels.export');
+    Route::get('personnels/template', [PersonnelController::class, 'template'])
+        ->name('personnels.template');
+    Route::post('personnels/import', [PersonnelController::class, 'importMethod'])
+        ->name('personnels.import');
 
     Route::resources([
         'positions' => PositionController::class,
