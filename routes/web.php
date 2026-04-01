@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceLogController;
+use App\Http\Controllers\AttendanceScanController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\PositionController;
@@ -11,6 +12,10 @@ use Laravel\Fortify\Features;
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
+
+Route::post('attendance/scan', [AttendanceScanController::class, 'store'])
+    ->middleware('throttle:60,1')
+    ->name('attendance.scan');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
