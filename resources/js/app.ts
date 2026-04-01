@@ -4,6 +4,7 @@ import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -13,6 +14,8 @@ createInertiaApp({
         switch (true) {
             case name === 'Welcome':
                 return null;
+            case name === 'attendance/Scanner':
+                return DefaultLayout;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
