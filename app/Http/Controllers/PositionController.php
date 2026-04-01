@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PositionsExport;
+use App\Exports\PositionsTemplateExport;
 use App\Http\Requests\StorePositionRequest;
 use App\Http\Requests\UpdatePositionRequest;
+use App\Imports\PositionsImport;
 use App\Http\Resources\PositionResource;
 use App\Models\Position;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PositionController extends Controller
 {
@@ -25,6 +31,27 @@ class PositionController extends Controller
         return Inertia::render('positions/Index', [
             'positions' => PositionResource::collection($positions),
         ]);
+    }
+
+    public function export(): BinaryFileResponse
+    {
+        return Excel::download(new PositionsExport(), 'positions.xlsx');
+    }
+
+    public function template(): BinaryFileResponse
+    {
+        return Excel::download(new PositionsTemplateExport(), 'positions-template.xlsx');
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
+        ]);
+
+        Excel::import(new PositionsImport(), $validated['file']);
+
+        return back()->with('success', 'Positions imported successfully.');
     }
 
     /**
