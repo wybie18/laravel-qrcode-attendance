@@ -9,13 +9,12 @@ use App\Http\Controllers\QrCodeController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
-Route::inertia('/', 'Welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
-
 Route::post('attendance/scan', [AttendanceScanController::class, 'store'])
     ->middleware('throttle:60,1')
     ->name('attendance.scan');
+
+Route::inertia('/', 'attendance/Scanner')
+    ->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
