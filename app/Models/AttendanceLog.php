@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['log_date', 'time_in', 'time_out'])]
+#[Fillable(['personnel_id', 'log_date', 'time_in', 'time_out'])]
 class AttendanceLog extends Model
 {
     use HasFactory;
@@ -21,5 +21,10 @@ class AttendanceLog extends Model
             'time_in' => 'datetime:H:i:s',
             'time_out' => 'datetime:H:i:s',
         ];
+    }
+
+    public function personnel()
+    {
+        return $this->belongsTo(Personnel::class);
     }
 }
