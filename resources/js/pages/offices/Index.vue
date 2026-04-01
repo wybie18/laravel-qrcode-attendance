@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { computed, shallowRef } from 'vue';
-import { index } from '@/actions/App/Http/Controllers/OfficeController';
+import { exportMethod, index } from '@/actions/App/Http/Controllers/OfficeController';
 import CreateOfficeDialog from '@/pages/offices/components/CreateOfficeDialog.vue';
 import DeleteOfficeDialog from '@/pages/offices/components/DeleteOfficeDialog.vue';
 import EditOfficeDialog from '@/pages/offices/components/EditOfficeDialog.vue';
+import ImportOfficesDialog from '@/pages/offices/components/ImportOfficesDialog.vue';
 import { Button } from '@/components/ui/button';
 import {
     Pagination,
@@ -31,6 +32,7 @@ import { index as officesIndex } from '@/routes/offices';
 const props = defineProps<OfficePageProps>();
 
 const createDialogOpen = shallowRef(false);
+const importDialogOpen = shallowRef(false);
 const editDialogOpen = shallowRef(false);
 const deleteDialogOpen = shallowRef(false);
 
@@ -90,9 +92,15 @@ defineOptions({
                 </p>
             </div>
 
-            <CreateOfficeDialog
-                v-model:open="createDialogOpen"
-            />
+            <div class="flex items-center gap-2">
+                <Button as-child variant="outline">
+                    <a :href="exportMethod.url()">Export Excel</a>
+                </Button>
+                <ImportOfficesDialog v-model:open="importDialogOpen" />
+                <CreateOfficeDialog
+                    v-model:open="createDialogOpen"
+                />
+            </div>
         </div>
 
         <div class="rounded-xl border border-sidebar-border/70">

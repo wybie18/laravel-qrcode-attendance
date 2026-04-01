@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OfficesExport;
+use App\Exports\OfficesTemplateExport;
 use App\Http\Requests\StoreOfficeRequest;
 use App\Http\Requests\UpdateOfficeRequest;
+use App\Imports\OfficesImport;
 use App\Http\Resources\OfficeResource;
 use App\Models\Office;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class OfficeController extends Controller
 {
@@ -25,6 +31,27 @@ class OfficeController extends Controller
         return Inertia::render('offices/Index', [
             'offices' => OfficeResource::collection($offices),
         ]);
+    }
+
+    public function exportMethod(): BinaryFileResponse
+    {
+        return Excel::download(new OfficesExport(), 'offices.xlsx');
+    }
+
+    public function template(): BinaryFileResponse
+    {
+        return Excel::download(new OfficesTemplateExport(), 'offices-template.xlsx');
+    }
+
+    public function importMethod(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
+        ]);
+
+        Excel::import(new OfficesImport(), $validated['file']);
+
+        return back()->with('success', 'Offices imported successfully.');
     }
 
     /**

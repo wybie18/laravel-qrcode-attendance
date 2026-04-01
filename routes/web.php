@@ -21,6 +21,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('positions.template');
     Route::post('positions/import', [PositionController::class, 'import'])
         ->name('positions.import');
+        Route::get('offices/export', [OfficeController::class, 'exportMethod'])
+            ->name('offices.export');
+        Route::get('offices/template', [OfficeController::class, 'template'])
+            ->name('offices.template');
+        Route::post('offices/import', [OfficeController::class, 'importMethod'])
+            ->name('offices.import');
 
     Route::resources([
         'positions' => PositionController::class,
