@@ -43,7 +43,9 @@ class PersonnelService
      */
     public function update(Personnel $personnel, array $validated): Personnel
     {
-        $validated['qr_code'] = $this->generateQrCode($validated);
+        if (blank($personnel->qr_code)) {
+            $validated['qr_code'] = $this->generateQrCode($validated);
+        }
         
         return DB::transaction(function () use ($personnel, $validated): Personnel {
             $personnel->update($validated);

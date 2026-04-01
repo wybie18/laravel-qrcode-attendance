@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { computed, shallowRef } from 'vue';
-import { index } from '@/actions/App/Http/Controllers/PersonnelController';
+import { exportMethod, index } from '@/actions/App/Http/Controllers/PersonnelController';
 import CreatePersonnelDialog from '@/pages/personnel/components/CreatePersonnelDialog.vue';
 import DeletePersonnelDialog from '@/pages/personnel/components/DeletePersonnelDialog.vue';
 import EditPersonnelDialog from '@/pages/personnel/components/EditPersonnelDialog.vue';
+import ImportPersonnelsDialog from '@/pages/personnel/components/ImportPersonnelsDialog.vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -44,6 +45,7 @@ import axios from 'axios';
 const props = defineProps<PersonnelPageProps>();
 
 const createDialogOpen = shallowRef(false);
+const importDialogOpen = shallowRef(false);
 const showDialogOpen = shallowRef(false);
 const editDialogOpen = shallowRef(false);
 const deleteDialogOpen = shallowRef(false);
@@ -155,11 +157,17 @@ defineOptions({
                 </p>
             </div>
 
-            <CreatePersonnelDialog
-                v-model:open="createDialogOpen"
-                :offices="offices"
-                :positions="positions"
-            />
+            <div class="flex items-center gap-2">
+                <Button as-child variant="outline">
+                    <a :href="exportMethod.url()">Export Excel</a>
+                </Button>
+                <ImportPersonnelsDialog v-model:open="importDialogOpen" />
+                <CreatePersonnelDialog
+                    v-model:open="createDialogOpen"
+                    :offices="offices"
+                    :positions="positions"
+                />
+            </div>
         </div>
 
         <div class="rounded-xl border border-sidebar-border/70">
