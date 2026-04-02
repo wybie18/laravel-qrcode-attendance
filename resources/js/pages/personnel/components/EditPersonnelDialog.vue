@@ -22,8 +22,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import type { Personnel } from '@/types/personnel';
 import type { Office } from '@/types/office';
+import type { Personnel } from '@/types/personnel';
 import type { Position } from '@/types/position';
 
 interface Props {
