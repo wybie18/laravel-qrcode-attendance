@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\AttendanceLogController;
 use App\Http\Controllers\AttendanceScanController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\QrCodeController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
 Route::post('attendance/scan', [AttendanceScanController::class, 'store'])
     ->middleware('throttle:60,1')
@@ -17,7 +17,7 @@ Route::inertia('/', 'attendance/Scanner')
     ->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('positions/export', [PositionController::class, 'export'])
         ->name('positions.export');
