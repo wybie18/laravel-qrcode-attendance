@@ -1,4 +1,4 @@
-import { PaginationMeta } from "./pagination";
+import type { PaginationMeta } from "./pagination";
 
 export interface Position {
     id: number;
