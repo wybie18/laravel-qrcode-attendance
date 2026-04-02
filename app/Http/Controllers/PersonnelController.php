@@ -28,31 +28,45 @@ class PersonnelController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $personnels = Personnel::query()
             ->with(['office', 'position'])
+            ->when($request->input('search'), function ($query, $search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->when($request->input('office_id'), function ($query, $officeId) {
+                $query->where('office_id', $officeId);
+            })
             ->latest('id')
-            ->paginate(15);
-            
+            ->paginate(15)
+            ->withQueryString();
+
         $offices = Office::orderBy('name')->get();
         $positions = Position::orderBy('name')->get();
-        
+
         return Inertia::render('personnel/Index', [
             'personnels' => PersonnelResource::collection($personnels),
             'offices' => OfficeResource::collection($offices),
             'positions' => PositionResource::collection($positions),
+            'filters' => [
+                'search' => $request->input('search'),
+                'office_id' => $request->input('office_id'),
+            ],
         ]);
     }
 
     public function exportMethod(): BinaryFileResponse
     {
-        return Excel::download(new PersonnelsExport(), 'personnels.xlsx');
+        return Excel::download(new PersonnelsExport, 'personnels.xlsx');
     }
 
     public function template(): BinaryFileResponse
     {
-        return Excel::download(new PersonnelsTemplateExport(), 'personnels-template.xlsx');
+        return Excel::download(new PersonnelsTemplateExport, 'personnels-template.xlsx');
     }
 
     public function importMethod(Request $request): RedirectResponse
@@ -61,7 +75,7 @@ class PersonnelController extends Controller
             'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
         ]);
 
-        Excel::import(new PersonnelsImport(), $validated['file']);
+        Excel::import(new PersonnelsImport, $validated['file']);
 
         return back()->with('success', 'Personnels imported successfully.');
     }

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
+import axios from 'axios';
+import QrcodeVue from 'qrcode.vue';
 import { computed, shallowRef } from 'vue';
-import { exportMethod, index } from '@/actions/App/Http/Controllers/PersonnelController';
-import CreatePersonnelDialog from '@/pages/personnel/components/CreatePersonnelDialog.vue';
-import DeletePersonnelDialog from '@/pages/personnel/components/DeletePersonnelDialog.vue';
-import EditPersonnelDialog from '@/pages/personnel/components/EditPersonnelDialog.vue';
-import ImportPersonnelsDialog from '@/pages/personnel/components/ImportPersonnelsDialog.vue';
+import {
+    exportMethod,
+    index,
+} from '@/actions/App/Http/Controllers/PersonnelController';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -26,6 +27,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
+import { Spinner } from '@/components/ui/spinner';
 import {
     Table,
     TableBody,
@@ -35,14 +37,24 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Spinner } from '@/components/ui/spinner';
+import { usePersonnelFilters } from '@/composables/usePersonnelFilters';
+import CreatePersonnelDialog from '@/pages/personnel/components/CreatePersonnelDialog.vue';
+import DeletePersonnelDialog from '@/pages/personnel/components/DeletePersonnelDialog.vue';
+import EditPersonnelDialog from '@/pages/personnel/components/EditPersonnelDialog.vue';
+import ImportPersonnelsDialog from '@/pages/personnel/components/ImportPersonnelsDialog.vue';
+import PersonnelFilters from '@/pages/personnel/components/PersonnelFilters.vue';
+import { index as personnelsIndex } from '@/routes/personnels';
 import type { PersonnelPageProps, Personnel } from '@/types/personnel';
 import { fullName } from '@/utils';
-import { index as personnelsIndex } from '@/routes/personnels';
-import QrcodeVue from 'qrcode.vue';
-import axios from 'axios';
 
 const props = defineProps<PersonnelPageProps>();
+
+const { search, officeId, hasActiveFilters, clearFilters } =
+    usePersonnelFilters({
+        url: index.url(),
+        initialFilters: props.filters,
+        only: ['personnels'],
+    });
 
 const createDialogOpen = shallowRef(false);
 const importDialogOpen = shallowRef(false);
@@ -98,12 +110,16 @@ async function downloadQrCode(): Promise<void> {
     isDownloadingQr.value = true;
 
     try {
-        const response = await axios.post('/qr-code/download', { 
-            qr_data: selectedPersonnel.value.qr_code,
-            filename: `qr-${selectedPersonnel.value.last_name}-${selectedPersonnel.value.id}`,
-        }, {
-            responseType: 'blob',
-        });
+        const response = await axios.post(
+            '/qr-code/download',
+            {
+                qr_data: selectedPersonnel.value.qr_code,
+                filename: `qr-${selectedPersonnel.value.last_name}-${selectedPersonnel.value.id}`,
+            },
+            {
+                responseType: 'blob',
+            },
+        );
 
         const url = window.URL.createObjectURL(new Blob([response.data]));
 
@@ -112,17 +128,20 @@ async function downloadQrCode(): Promise<void> {
 
         const contentDisposition = response.headers['content-disposition'];
         let fileName = 'downloaded-qr.png';
+
         if (contentDisposition) {
-            const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            const fileNameMatch =
+                contentDisposition.match(/filename="?([^"]+)"?/);
+
             if (fileNameMatch && fileNameMatch.length === 2) {
                 fileName = fileNameMatch[1];
             }
         }
-        
+
         link.setAttribute('download', fileName);
         document.body.appendChild(link);
         link.click();
-        
+
         // 4. Cleanup
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
@@ -148,7 +167,9 @@ defineOptions({
 <template>
     <Head title="Personnel" />
 
-    <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+    <div
+        class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4"
+    >
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h1 class="text-2xl font-semibold tracking-tight">Personnel</h1>
@@ -170,6 +191,14 @@ defineOptions({
             </div>
         </div>
 
+        <PersonnelFilters
+            v-model:search="search"
+            v-model:office-id="officeId"
+            :offices="offices"
+            :has-active-filters="hasActiveFilters"
+            @clear="clearFilters"
+        />
+
         <div class="rounded-xl border border-sidebar-border/70">
             <Table>
                 <TableHeader>
@@ -185,21 +214,44 @@ defineOptions({
 
                 <TableBody>
                     <template v-if="personnelRows.length">
-                        <TableRow v-for="personnel in personnelRows" :key="personnel.id">
-                            <TableCell class="font-medium">{{ fullName(personnel) }}</TableCell>
+                        <TableRow
+                            v-for="personnel in personnelRows"
+                            :key="personnel.id"
+                        >
+                            <TableCell class="font-medium">{{
+                                fullName(personnel)
+                            }}</TableCell>
                             <TableCell>{{ personnel.email }}</TableCell>
-                            <TableCell>{{ personnel.phone_number ?? '-' }}</TableCell>
-                            <TableCell>{{ personnel.office?.name ?? '-' }}</TableCell>
-                            <TableCell>{{ personnel.position?.name ?? '-' }}</TableCell>
+                            <TableCell>{{
+                                personnel.phone_number ?? '-'
+                            }}</TableCell>
+                            <TableCell>{{
+                                personnel.office?.name ?? '-'
+                            }}</TableCell>
+                            <TableCell>{{
+                                personnel.position?.name ?? '-'
+                            }}</TableCell>
                             <TableCell class="text-right">
                                 <div class="flex justify-end gap-2">
-                                    <Button variant="outline" size="sm" @click="openShowDialog(personnel)">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        @click="openShowDialog(personnel)"
+                                    >
                                         Show
                                     </Button>
-                                    <Button variant="secondary" size="sm" @click="openEditDialog(personnel)">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        @click="openEditDialog(personnel)"
+                                    >
                                         Edit
                                     </Button>
-                                    <Button variant="destructive" size="sm" @click="openDeleteDialog(personnel)">
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        @click="openDeleteDialog(personnel)"
+                                    >
                                         Delete
                                     </Button>
                                 </div>
@@ -216,8 +268,8 @@ defineOptions({
 
         <div class="flex flex-wrap items-center justify-between gap-4">
             <p class="text-sm text-muted-foreground">
-                Showing {{ props.personnels.meta.from ?? 0 }} to {{ props.personnels.meta.to ?? 0 }} of
-                {{ totalItems }} records.
+                Showing {{ props.personnels.meta.from ?? 0 }} to
+                {{ props.personnels.meta.to ?? 0 }} of {{ totalItems }} records.
             </p>
 
             <div>
@@ -235,7 +287,10 @@ defineOptions({
                         <PaginationFirst />
                         <PaginationPrevious />
 
-                        <template v-for="(item, itemIndex) in items" :key="`page-${itemIndex}`">
+                        <template
+                            v-for="(item, itemIndex) in items"
+                            :key="`page-${itemIndex}`"
+                        >
                             <PaginationItem
                                 v-if="item.type === 'page'"
                                 :value="item.value"
@@ -263,10 +318,13 @@ defineOptions({
                     </DialogDescription>
                 </DialogHeader>
 
-                <dl v-if="selectedPersonnel" class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+                <dl
+                    v-if="selectedPersonnel"
+                    class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2"
+                >
                     <!-- 2 Column span and center -->
-                     
-                     <div class="col-span-1 sm:col-span-2 mx-auto text-center">
+
+                    <div class="col-span-1 mx-auto text-center sm:col-span-2">
                         <span class="text-muted-foreground">QR Code</span>
                         <div class="mt-2">
                             <QrcodeVue
@@ -281,33 +339,48 @@ defineOptions({
                             class="mt-3"
                             size="sm"
                             variant="outline"
-                            :disabled="!selectedPersonnel.qr_code || isDownloadingQr"
+                            :disabled="
+                                !selectedPersonnel.qr_code || isDownloadingQr
+                            "
                             @click="downloadQrCode"
                         >
                             <Spinner v-if="isDownloadingQr" class="mr-2" />
-                            {{ isDownloadingQr ? 'Downloading...' : 'Download QR' }}
+                            {{
+                                isDownloadingQr
+                                    ? 'Downloading...'
+                                    : 'Download QR'
+                            }}
                         </Button>
-
-                     </div>
+                    </div>
                     <div class="col-span-2 text-center">
                         <dt class="text-muted-foreground">Full Name</dt>
-                        <dd class="font-medium">{{ fullName(selectedPersonnel) }}</dd>
+                        <dd class="font-medium">
+                            {{ fullName(selectedPersonnel) }}
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-muted-foreground">Email</dt>
-                        <dd class="font-medium">{{ selectedPersonnel.email }}</dd>
+                        <dd class="font-medium">
+                            {{ selectedPersonnel.email }}
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-muted-foreground">Phone</dt>
-                        <dd class="font-medium">{{ selectedPersonnel.phone_number ?? '-' }}</dd>
+                        <dd class="font-medium">
+                            {{ selectedPersonnel.phone_number ?? '-' }}
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-muted-foreground">Office</dt>
-                        <dd class="font-medium">{{ selectedPersonnel.office?.name ?? '-' }}</dd>
+                        <dd class="font-medium">
+                            {{ selectedPersonnel.office?.name ?? '-' }}
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-muted-foreground">Position</dt>
-                        <dd class="font-medium">{{ selectedPersonnel.position?.name ?? '-' }}</dd>
+                        <dd class="font-medium">
+                            {{ selectedPersonnel.position?.name ?? '-' }}
+                        </dd>
                     </div>
                 </dl>
 
