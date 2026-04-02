@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AttendanceLogsExport;
+use App\Exports\AttendanceLogsTemplateExport;
 use App\Http\Requests\StoreAttendanceLogRequest;
 use App\Http\Requests\UpdateAttendanceLogRequest;
 use App\Http\Resources\AttendanceLogResource;
 use App\Http\Resources\OfficeResource;
 use App\Http\Resources\PersonnelResource;
+use App\Imports\AttendanceLogsImport;
 use App\Models\AttendanceLog;
 use App\Models\Office;
 use App\Models\Personnel;
 use App\Services\AttendanceService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AttendanceLogController extends Controller
 {
@@ -80,6 +86,11 @@ class AttendanceLogController extends Controller
         ]);
     }
 
+    public function exportMethod(): BinaryFileResponse
+    {
+        return Excel::download(new AttendanceLogsExport(), 'attendance-logs.xlsx');
+    }
+    
     /**
      * Store a newly created resource in storage.
      */
