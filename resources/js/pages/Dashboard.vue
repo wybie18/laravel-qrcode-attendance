@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Head, router, usePoll } from '@inertiajs/vue3';
-import { shallowRef, watch } from 'vue';
+import { VisAxis, VisGroupedBar, VisXYContainer } from '@unovis/vue';
 import type { AcceptableValue } from 'reka-ui';
+import { shallowRef, watch } from 'vue';
 import {
     Card,
     CardContent,
@@ -9,6 +10,14 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import type { ChartConfig } from '@/components/ui/chart';
+import {
+    ChartContainer,
+    ChartCrosshair,
+    ChartTooltip,
+    ChartTooltipContent,
+    componentToString,
+} from '@/components/ui/chart';
 import {
     Select,
     SelectContent,
@@ -32,15 +41,6 @@ import type {
     TrendGranularity,
 } from '@/types/dashboard';
 
-import type { ChartConfig } from '@/components/ui/chart';
-import { VisAxis, VisGroupedBar, VisXYContainer } from '@unovis/vue';
-import {
-    ChartContainer,
-    ChartCrosshair,
-    ChartTooltip,
-    ChartTooltipContent,
-    componentToString,
-} from '@/components/ui/chart';
 
 const props = defineProps<DashboardPageProps>();
 
