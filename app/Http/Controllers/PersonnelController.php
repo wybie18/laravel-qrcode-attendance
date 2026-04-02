@@ -75,7 +75,7 @@ class PersonnelController extends Controller
             'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
         ]);
 
-        Excel::import(new PersonnelsImport, $validated['file']);
+        Excel::import(app(PersonnelsImport::class), $validated['file']);
 
         return back()->with('success', 'Personnels imported successfully.');
     }

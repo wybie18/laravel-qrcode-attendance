@@ -115,4 +115,9 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'personnel_onboarding_cc' => [
+        'address' => env('MAIL_PERSONNEL_ONBOARDING_CC_ADDRESS', 'admin.r8.ormoccity@deped.gov.ph'),
+        'name' => env('MAIL_PERSONNEL_ONBOARDING_CC_NAME', 'SDO Ormoc Admin Team'),
+    ],
+
 ];

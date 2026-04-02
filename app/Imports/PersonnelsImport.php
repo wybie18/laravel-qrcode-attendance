@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\Office;
 use App\Models\Personnel;
 use App\Models\Position;
+use App\Services\PersonnelOnboardingEmailService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -12,6 +13,10 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class PersonnelsImport implements ToCollection, WithHeadingRow
 {
+    public function __construct(
+        private readonly PersonnelOnboardingEmailService $personnelOnboardingEmailService,
+    ) {}
+
     public function collection(Collection $rows): void
     {
         $rows
@@ -57,7 +62,7 @@ class PersonnelsImport implements ToCollection, WithHeadingRow
                     ->where('email', $row['email'])
                     ->first();
 
-                Personnel::query()->updateOrCreate(
+                $personnel = Personnel::query()->updateOrCreate(
                     ['email' => $row['email']],
                     [
                         'first_name' => $row['first_name'],
@@ -69,6 +74,10 @@ class PersonnelsImport implements ToCollection, WithHeadingRow
                         'position_id' => $position->id,
                     ]
                 );
+
+                if ($personnel->wasRecentlyCreated) {
+                    $this->personnelOnboardingEmailService->sendWelcomeEmail($personnel);
+                }
             });
     }
 }

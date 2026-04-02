@@ -8,6 +8,10 @@ use Illuminate\Support\Str;
 
 class PersonnelService
 {
+    public function __construct(
+        private readonly PersonnelOnboardingEmailService $personnelOnboardingEmailService,
+    ) {}
+
     /**
      * @param  array{
      *     first_name: string,
@@ -23,11 +27,15 @@ class PersonnelService
     {
         $validated['qr_code'] = $this->generateQrCode($validated);
 
-        return DB::transaction(function () use ($validated): Personnel {
+        $personnel = DB::transaction(function () use ($validated): Personnel {
             return Personnel::query()
                 ->create($validated)
                 ->load(['office', 'position']);
         });
+
+        $this->personnelOnboardingEmailService->sendWelcomeEmail($personnel);
+
+        return $personnel;
     }
 
     /**
