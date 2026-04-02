@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { computed, shallowRef } from 'vue';
-import { index } from '@/actions/App/Http/Controllers/AttendanceLogController';
+import {
+    exportMethod,
+    index,
+} from '@/actions/App/Http/Controllers/AttendanceLogController';
 import { Button } from '@/components/ui/button';
 import {
     Pagination,
@@ -32,7 +35,7 @@ import type {
     AttendanceLog,
     AttendanceLogsPageProps,
 } from '@/types/attendance-log';
-import { fullName } from '@/utils';
+import { fullName, formatDate, formatTime } from '@/utils';
 
 const props = defineProps<AttendanceLogsPageProps>();
 
@@ -107,10 +110,16 @@ defineOptions({
                 </p>
             </div>
 
-            <CreateAttendanceLogDialog
-                v-model:open="createDialogOpen"
-                :personnels="personnels"
-            />
+            <div class="flex items-center gap-2">
+                <Button as-child variant="outline">
+                    <a :href="exportMethod.url()">Export Excel</a>
+                </Button>
+
+                <CreateAttendanceLogDialog
+                    v-model:open="createDialogOpen"
+                    :personnels="personnels"
+                />
+            </div>
         </div>
 
         <AttendanceLogFilters
@@ -148,12 +157,12 @@ defineOptions({
                                         : 'Unknown personnel'
                                 }}
                             </TableCell>
-                            <TableCell>{{ attendanceLog.log_date }}</TableCell>
+                            <TableCell>{{ formatDate(attendanceLog.log_date) }}</TableCell>
                             <TableCell>{{
-                                attendanceLog.time_in ?? '-'
+                                formatTime(attendanceLog.time_in)
                             }}</TableCell>
                             <TableCell>{{
-                                attendanceLog.time_out ?? '-'
+                                formatTime(attendanceLog.time_out)
                             }}</TableCell>
                             <TableCell class="text-right">
                                 <div class="flex justify-end gap-2">
