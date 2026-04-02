@@ -37,6 +37,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('personnels.template');
     Route::post('personnels/import', [PersonnelController::class, 'importMethod'])
         ->name('personnels.import');
+    Route::get('attendance-logs/export', [AttendanceLogController::class, 'exportMethod'])
+        ->name('attendance-logs.export');
 
     Route::resources([
         'positions' => PositionController::class,
