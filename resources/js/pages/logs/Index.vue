@@ -22,11 +22,16 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useAttendanceLogFilters } from '@/composables/useAttendanceLogFilters';
+import AttendanceLogFilters from '@/pages/logs/components/AttendanceLogFilters.vue';
 import CreateAttendanceLogDialog from '@/pages/logs/components/CreateAttendanceLogDialog.vue';
 import DeleteAttendanceLogDialog from '@/pages/logs/components/DeleteAttendanceLogDialog.vue';
 import EditAttendanceLogDialog from '@/pages/logs/components/EditAttendanceLogDialog.vue';
 import { index as attendanceLogsIndex } from '@/routes/attendance-logs';
-import type { AttendanceLog, AttendanceLogsPageProps } from '@/types/attendance-log';
+import type {
+    AttendanceLog,
+    AttendanceLogsPageProps,
+} from '@/types/attendance-log';
 import { fullName } from '@/utils';
 
 const props = defineProps<AttendanceLogsPageProps>();
@@ -39,11 +44,17 @@ const selectedAttendanceLog = shallowRef<AttendanceLog | null>(null);
 
 const attendanceLogRows = computed(() => props.attendanceLogs.data);
 const personnels = computed(() => props.personnels.data);
+const offices = computed(() => props.offices.data);
 
 const currentPage = computed(() => props.attendanceLogs.meta.current_page);
 const lastPage = computed(() => props.attendanceLogs.meta.last_page);
 const totalItems = computed(() => props.attendanceLogs.meta.total);
 const perPage = computed(() => props.attendanceLogs.meta.per_page);
+
+const filters = useAttendanceLogFilters({
+    url: index.url(),
+    initialFilters: props.filters,
+});
 
 function visitPage(page: number): void {
     if (page === currentPage.value) {
@@ -83,10 +94,14 @@ defineOptions({
 <template>
     <Head title="Attendance Logs" />
 
-    <div class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+    <div
+        class="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4"
+    >
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h1 class="text-2xl font-semibold tracking-tight">Attendance Logs</h1>
+                <h1 class="text-2xl font-semibold tracking-tight">
+                    Attendance Logs
+                </h1>
                 <p class="text-sm text-muted-foreground">
                     Manage attendance entries for all personnel.
                 </p>
@@ -97,6 +112,16 @@ defineOptions({
                 :personnels="personnels"
             />
         </div>
+
+        <AttendanceLogFilters
+            v-model:search="filters.search.value"
+            v-model:office-id="filters.officeId.value"
+            v-model:date-from="filters.dateFrom.value"
+            v-model:date-to="filters.dateTo.value"
+            :offices="offices"
+            :has-active-filters="filters.hasActiveFilters.value"
+            @clear="filters.clearFilters"
+        />
 
         <div class="rounded-xl border border-sidebar-border/70">
             <Table>
@@ -112,19 +137,38 @@ defineOptions({
 
                 <TableBody>
                     <template v-if="attendanceLogRows.length">
-                        <TableRow v-for="attendanceLog in attendanceLogRows" :key="attendanceLog.id">
+                        <TableRow
+                            v-for="attendanceLog in attendanceLogRows"
+                            :key="attendanceLog.id"
+                        >
                             <TableCell class="font-medium">
-                                {{ attendanceLog.personnel ? fullName(attendanceLog.personnel) : 'Unknown personnel' }}
+                                {{
+                                    attendanceLog.personnel
+                                        ? fullName(attendanceLog.personnel)
+                                        : 'Unknown personnel'
+                                }}
                             </TableCell>
                             <TableCell>{{ attendanceLog.log_date }}</TableCell>
-                            <TableCell>{{ attendanceLog.time_in ?? '-' }}</TableCell>
-                            <TableCell>{{ attendanceLog.time_out ?? '-' }}</TableCell>
+                            <TableCell>{{
+                                attendanceLog.time_in ?? '-'
+                            }}</TableCell>
+                            <TableCell>{{
+                                attendanceLog.time_out ?? '-'
+                            }}</TableCell>
                             <TableCell class="text-right">
                                 <div class="flex justify-end gap-2">
-                                    <Button variant="secondary" size="sm" @click="openEditDialog(attendanceLog)">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        @click="openEditDialog(attendanceLog)"
+                                    >
                                         Edit
                                     </Button>
-                                    <Button variant="destructive" size="sm" @click="openDeleteDialog(attendanceLog)">
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        @click="openDeleteDialog(attendanceLog)"
+                                    >
                                         Delete
                                     </Button>
                                 </div>
@@ -141,7 +185,8 @@ defineOptions({
 
         <div class="flex flex-wrap items-center justify-between gap-4">
             <p class="text-sm text-muted-foreground">
-                Showing {{ props.attendanceLogs.meta.from ?? 0 }} to {{ props.attendanceLogs.meta.to ?? 0 }} of
+                Showing {{ props.attendanceLogs.meta.from ?? 0 }} to
+                {{ props.attendanceLogs.meta.to ?? 0 }} of
                 {{ totalItems }} records.
             </p>
 
@@ -160,7 +205,10 @@ defineOptions({
                         <PaginationFirst />
                         <PaginationPrevious />
 
-                        <template v-for="(item, itemIndex) in items" :key="`page-${itemIndex}`">
+                        <template
+                            v-for="(item, itemIndex) in items"
+                            :key="`page-${itemIndex}`"
+                        >
                             <PaginationItem
                                 v-if="item.type === 'page'"
                                 :value="item.value"
