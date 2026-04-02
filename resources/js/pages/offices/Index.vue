@@ -2,10 +2,6 @@
 import { Head, router } from '@inertiajs/vue3';
 import { computed, shallowRef } from 'vue';
 import { exportMethod, index } from '@/actions/App/Http/Controllers/OfficeController';
-import CreateOfficeDialog from '@/pages/offices/components/CreateOfficeDialog.vue';
-import DeleteOfficeDialog from '@/pages/offices/components/DeleteOfficeDialog.vue';
-import EditOfficeDialog from '@/pages/offices/components/EditOfficeDialog.vue';
-import ImportOfficesDialog from '@/pages/offices/components/ImportOfficesDialog.vue';
 import { Button } from '@/components/ui/button';
 import {
     Pagination,
@@ -26,8 +22,12 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import type { OfficePageProps, Office } from '@/types/office';
+import CreateOfficeDialog from '@/pages/offices/components/CreateOfficeDialog.vue';
+import DeleteOfficeDialog from '@/pages/offices/components/DeleteOfficeDialog.vue';
+import EditOfficeDialog from '@/pages/offices/components/EditOfficeDialog.vue';
+import ImportOfficesDialog from '@/pages/offices/components/ImportOfficesDialog.vue';
 import { index as officesIndex } from '@/routes/offices';
+import type { OfficePageProps, Office } from '@/types/office';
 
 const props = defineProps<OfficePageProps>();
 
