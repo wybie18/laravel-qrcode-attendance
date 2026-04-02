@@ -3,10 +3,10 @@ import { Head } from '@inertiajs/vue3';
 import axios from 'axios';
 import { ScanLine } from 'lucide-vue-next';
 import { computed, onMounted, ref, shallowRef } from 'vue';
-import { scan } from '@/routes/attendance';
-import { Button } from '@/components/ui/button';
 import { QrcodeStream } from 'vue-qrcode-reader';
 import { toast } from 'vue-sonner';
+import { Button } from '@/components/ui/button';
+import { scan } from '@/routes/attendance';
 
 type AttendanceAction = 'time_in' | 'time_out';
 
@@ -47,7 +47,9 @@ const isPaused = ref(false);
 async function handleDetect(detectedCodes: DetectedQrCode[]): Promise<void> {
     const detectedQrCode = detectedCodes.find((result) => !!result.rawValue)?.rawValue?.trim();
 
-    if (!detectedQrCode) return;
+    if (!detectedQrCode) {
+return;
+}
 
     isPaused.value = true;
 
@@ -56,7 +58,9 @@ async function handleDetect(detectedCodes: DetectedQrCode[]): Promise<void> {
         detectedQrCode === lastAutoSubmittedCode.value
         && now - lastAutoSubmittedAt.value < 2000;
 
-    if (isDuplicateBurst) return;
+    if (isDuplicateBurst) {
+return;
+}
 
     lastScanAt.value = new Date().toLocaleTimeString();
 
