@@ -22,12 +22,12 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import CreatePositionDialog from '@/pages/positions/components/CreatePositionDialog.vue';
 import DeletePositionDialog from '@/pages/positions/components/DeletePositionDialog.vue';
 import EditPositionDialog from '@/pages/positions/components/EditPositionDialog.vue';
-import CreatePositionDialog from '@/pages/positions/components/CreatePositionDialog.vue';
 import ImportPositionsDialog from '@/pages/positions/components/ImportPositionsDialog.vue';
-import type { PositionPageProps, Position } from '@/types/position';
 import { index as positionsIndex } from '@/routes/positions';
+import type { PositionPageProps, Position } from '@/types/position';
 
 const props = defineProps<PositionPageProps>();
 
