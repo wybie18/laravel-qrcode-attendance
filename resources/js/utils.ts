@@ -38,3 +38,31 @@ export function formatTime(timeString: string | null): string {
 
     return `${displayHour}:${minute.toString().padStart(2, '0')} ${period}`;
 }
+
+let scanAudio: HTMLAudioElement | null = null;
+
+function getScanAudio(): HTMLAudioElement | null {
+    if (typeof Audio === 'undefined') {
+        return null;
+    }
+
+    if (!scanAudio) {
+        scanAudio = new Audio('/sounds/scan.mp3');
+        scanAudio.preload = 'auto';
+    }
+
+    return scanAudio;
+}
+
+export function playScanSound(): void {
+    const audio = getScanAudio();
+
+    if (!audio) {
+        return;
+    }
+
+    audio.currentTime = 0;
+    void audio.play().catch(() => {
+        // Ignore browser autoplay restrictions.
+    });
+}
