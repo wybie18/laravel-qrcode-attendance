@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookCheck, BookOpen, Briefcase, Building, Building2, FolderGit2, LayoutGrid, Users } from 'lucide-vue-next';
+import { BookCheck, BookOpen, Briefcase, Building, Building2, FolderGit2, LayoutGrid, QrCode, Users } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -14,11 +14,11 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, home } from '@/routes';
 import { index as attendanceLogIndex } from '@/routes/attendance-logs';
 import { index as officeIndex } from '@/routes/offices';
 import { index as personnelIndex } from '@/routes/personnels';
-import { index as positionIndex } from '@/routes/positions'
+import { index as positionIndex } from '@/routes/positions';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -46,6 +46,11 @@ const mainNavItems: NavItem[] = [
         title: 'Positions',
         href: positionIndex(),
         icon: Briefcase,
+    },
+    {
+        title: 'Scanner',
+        href: home(),
+        icon: QrCode,
     }
 ];
 
