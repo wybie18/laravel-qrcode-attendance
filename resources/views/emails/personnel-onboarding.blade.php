@@ -21,14 +21,14 @@
 
     <p>
         If you have any questions or need assistance, please contact us at
-        <a href="mailto:admin.r8.ormoccity@deped.gov.ph">admin.r8.ormoccity@deped.gov.ph</a>.
+        <a href="mailto:{{ config('mail.personnel_onboarding_cc.address') }}">{{ config('mail.personnel_onboarding_cc.address') }}</a>.
     </p>
 
     <p>We look forward to your visit.</p>
 
     <p>
         Best regards,<br>
-        SDO Ormoc Admin Team
+        {{ config('mail.personnel_onboarding_cc.name') }}
     </p>
 </body>
 </html>
