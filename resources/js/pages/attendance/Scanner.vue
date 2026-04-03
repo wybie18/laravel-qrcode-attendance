@@ -7,6 +7,7 @@ import { QrcodeStream } from 'vue-qrcode-reader';
 import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import { scan } from '@/routes/attendance';
+import { playScanSound } from '@/utils';
 
 type AttendanceAction = 'time_in' | 'time_out';
 
@@ -48,8 +49,8 @@ async function handleDetect(detectedCodes: DetectedQrCode[]): Promise<void> {
     const detectedQrCode = detectedCodes.find((result) => !!result.rawValue)?.rawValue?.trim();
 
     if (!detectedQrCode) {
-return;
-}
+    return;
+    }
 
     isPaused.value = true;
 
@@ -59,8 +60,8 @@ return;
         && now - lastAutoSubmittedAt.value < 2000;
 
     if (isDuplicateBurst) {
-return;
-}
+    return;
+    }
 
     lastScanAt.value = new Date().toLocaleTimeString();
 
@@ -99,6 +100,7 @@ async function submitAttendance(qrCode: string, action: AttendanceAction): Promi
         });
 
         toast.success(response.data.message);
+        playScanSound();
         lastAutoSubmittedCode.value = qrCode.trim();
         lastAutoSubmittedAt.value = Date.now();
     } catch {
