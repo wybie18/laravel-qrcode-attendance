@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendPersonnelOnboardingMail;
 use App\Mail\PersonnelOnboardingMail;
 use App\Models\Personnel;
 use Illuminate\Support\Facades\Mail;
@@ -20,7 +21,6 @@ class PersonnelOnboardingEmailService
 
         $qrImage = $this->qrCodeService->generateQrCodeImage($personnel->qr_code);
 
-        Mail::to($personnel->email)
-            ->send(new PersonnelOnboardingMail($personnel, base64_encode($qrImage)));
+        SendPersonnelOnboardingMail::dispatch($personnel, base64_encode($qrImage));
     }
 }
