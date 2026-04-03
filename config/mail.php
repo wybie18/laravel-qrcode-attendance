@@ -116,8 +116,8 @@ return [
     ],
 
     'personnel_onboarding_cc' => [
-        'address' => env('MAIL_PERSONNEL_ONBOARDING_CC_ADDRESS', 'admin.r8.ormoccity@deped.gov.ph'),
-        'name' => env('MAIL_PERSONNEL_ONBOARDING_CC_NAME', 'SDO Ormoc Admin Team'),
+        'address' => env('MAIL_PERSONNEL_ONBOARDING_CC_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_PERSONNEL_ONBOARDING_CC_NAME', 'QR TimeLog'),
     ],
 
 ];

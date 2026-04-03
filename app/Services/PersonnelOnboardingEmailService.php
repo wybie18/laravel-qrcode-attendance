@@ -21,6 +21,6 @@ class PersonnelOnboardingEmailService
         $qrImage = $this->qrCodeService->generateQrCodeImage($personnel->qr_code);
 
         Mail::to($personnel->email)
-            ->send(new PersonnelOnboardingMail($personnel, $qrImage));
+            ->send(new PersonnelOnboardingMail($personnel, base64_encode($qrImage)));
     }
 }

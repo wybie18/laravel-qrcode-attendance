@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\Personnel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -11,7 +12,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 
-class PersonnelOnboardingMail extends Mailable
+class PersonnelOnboardingMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -31,7 +32,7 @@ class PersonnelOnboardingMail extends Mailable
         return new Envelope(
             from: new Address(
                 (string) config('mail.from.address'),
-                'SDO Ormoc Admin Team',
+                (string) config('mail.from.name'),
             ),
             cc: [
                 new Address(
@@ -39,7 +40,7 @@ class PersonnelOnboardingMail extends Mailable
                     (string) config('mail.personnel_onboarding_cc.name'),
                 ),
             ],
-            subject: 'Check-In/Out System Registration Confirmation',
+            subject: 'QR TimeLog System Registration Confirmation',
         );
     }
 
@@ -61,7 +62,7 @@ class PersonnelOnboardingMail extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromData(fn (): string => $this->qrImage, 'qrcode.png')
+            Attachment::fromData(fn (): string => base64_decode($this->qrImage), 'qrcode.png')
                 ->withMime('image/png'),
         ];
     }
