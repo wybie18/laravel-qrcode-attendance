@@ -34,37 +34,51 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function loadSmtpSettings(): void
     {
+        $dbPath = config('database.connections.sqlite.database');
+        if ($dbPath && ! file_exists($dbPath)) {
+            return;
+        }
+
         if (! Schema::hasTable((new Setting())->getTable())) {
             return;
         }
 
-        $smtpSettings = Setting::query()
-            ->whereIn('key', [
-                'smtp_host',
-                'smtp_port',
-                'smtp_username',
-                'smtp_password',
-                'smtp_encryption',
-                'personnel_onboarding_cc_address',
-                'personnel_onboarding_cc_name',
-            ])
-            ->pluck('value', 'key');
+        try {
+            $smtpSettings = Setting::query()
+                ->whereIn('key', [
+                    'smtp_host',
+                    'smtp_port',
+                    'smtp_username',
+                    'smtp_password',
+                    'smtp_encryption',
+                    'personnel_onboarding_cc_address',
+                    'personnel_onboarding_cc_name',
+                ])
+                ->pluck('value', 'key');
 
-        if ($smtpSettings->isEmpty()) {
-            return;
+            if ($smtpSettings->isEmpty()) {
+                return;
+            }
+
+            config([
+                'mail.mailers.smtp.host' => $smtpSettings->get('smtp_host', config('mail.mailers.smtp.host')),
+                'mail.mailers.smtp.port' => $smtpSettings->has('smtp_port')
+                    ? (int) $smtpSettings->get('smtp_port')
+                    : config('mail.mailers.smtp.port'),
+                'mail.mailers.smtp.username' => $smtpSettings->get('smtp_username', config('mail.mailers.smtp.username')),
+                'mail.mailers.smtp.password' => $smtpSettings->get('smtp_password', config('mail.mailers.smtp.password')),
+                'mail.mailers.smtp.encryption' => $smtpSettings->get('smtp_encryption') ?: null,
+                'mail.personnel_onboarding_cc.address' => $smtpSettings->get('personnel_onboarding_cc_address', config('mail.personnel_onboarding_cc.address')),
+                'mail.personnel_onboarding_cc.name' => $smtpSettings->get('personnel_onboarding_cc_name', config('mail.personnel_onboarding_cc.name')),
+
+                'mail.from.address' => $smtpSettings->get('smtp_username', config('mail.from.address')),
+            ]);
+
+            app('mail.manager')->purge('smtp');
+            app('mail.manager')->forgetMailers();
+        } catch (\Throwable $th) {
+            \Illuminate\Support\Facades\Log::error('SMTP Config Error in Background: ' . $th->getMessage());
         }
-
-        config([
-            'mail.mailers.smtp.host' => $smtpSettings->get('smtp_host', config('mail.mailers.smtp.host')),
-            'mail.mailers.smtp.port' => $smtpSettings->has('smtp_port')
-                ? (int) $smtpSettings->get('smtp_port')
-                : config('mail.mailers.smtp.port'),
-            'mail.mailers.smtp.username' => $smtpSettings->get('smtp_username', config('mail.mailers.smtp.username')),
-            'mail.mailers.smtp.password' => $smtpSettings->get('smtp_password', config('mail.mailers.smtp.password')),
-            'mail.mailers.smtp.encryption' => $smtpSettings->get('smtp_encryption') ?: null,
-            'mail.personnel_onboarding_cc.address' => $smtpSettings->get('personnel_onboarding_cc_address', config('mail.personnel_onboarding_cc.address')),
-            'mail.personnel_onboarding_cc.name' => $smtpSettings->get('personnel_onboarding_cc_name', config('mail.personnel_onboarding_cc.name')),
-        ]);
     }
 
     /**
