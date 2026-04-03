@@ -44,6 +44,8 @@ class EmailController extends Controller
             'mail.mailers.smtp.encryption' => $validated['smtp_encryption'] ?: null,
             'mail.personnel_onboarding_cc.address' => $validated['personnel_onboarding_cc_address'],
             'mail.personnel_onboarding_cc.name' => $validated['personnel_onboarding_cc_name'],
+
+            'mail.from.address' => $validated['smtp_username'],
         ]);
 
         app('mail.manager')->purge('smtp');
