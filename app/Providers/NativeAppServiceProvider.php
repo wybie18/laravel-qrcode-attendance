@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Native\Desktop\Facades\Window;
 use Native\Desktop\Contracts\ProvidesPhpIni;
 use Native\Desktop\Facades\Menu;
@@ -26,6 +28,12 @@ class NativeAppServiceProvider implements ProvidesPhpIni
         );
 
         Window::open();
+
+        try {
+            Artisan::call('migrate', ['--force' => true]);
+        } catch (\Exception $e) {
+            Log::error('Auto-migration failed on boot: ' . $e->getMessage());
+        }
     }
 
     /**
