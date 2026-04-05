@@ -32,6 +32,7 @@ class SendPersonnelOnboardingMail implements ShouldQueue
         $settings = Setting::whereIn('key', [
             'smtp_host', 'smtp_port', 'smtp_username',
             'smtp_password', 'smtp_encryption',
+            'personnel_onboarding_cc_address', 'personnel_onboarding_cc_name',
         ])->pluck('value', 'key');
 
         config([
@@ -41,6 +42,9 @@ class SendPersonnelOnboardingMail implements ShouldQueue
             'mail.mailers.smtp.password'   => $settings->get('smtp_password'),
             'mail.mailers.smtp.encryption' => $settings->get('smtp_encryption') ?: null,
             'mail.from.address'            => $settings->get('smtp_username'),
+
+            'mail.personnel_onboarding_cc.address' => $settings->get('personnel_onboarding_cc_address'),
+            'mail.personnel_onboarding_cc.name' => $settings->get('personnel_onboarding_cc_name'),
         ]);
 
         app('mail.manager')->purge('smtp');
