@@ -23,7 +23,8 @@ class NativeAppServiceProvider implements ProvidesPhpIni
             Menu::view(),
             Menu::window(),
             Menu::make(
-                Menu::route('login')->label('Go to Login')
+                Menu::route('login')->label('Go to Login'),
+                Menu::route('home')->label('Go to Home'),
             )->label('Admin')
         );
 
