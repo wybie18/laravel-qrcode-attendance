@@ -27,6 +27,7 @@ class PersonnelsExport implements FromCollection, ShouldAutoSize, WithHeadings, 
                 'phone_number',
                 'office_id',
                 'position_id',
+                'qr_code',
             ])
             ->map(function (Personnel $personnel): array {
                 return [
@@ -38,6 +39,7 @@ class PersonnelsExport implements FromCollection, ShouldAutoSize, WithHeadings, 
                     'office' => $personnel->office?->name,
                     'office_category' => $personnel->office?->category,
                     'position' => $personnel->position?->name,
+                    'qr_code' => $personnel->qr_code,
                 ];
             });
     }
@@ -53,6 +55,7 @@ class PersonnelsExport implements FromCollection, ShouldAutoSize, WithHeadings, 
             'office',
             'office_category',
             'position',
+            'qr_code'
         ];
     }
 
