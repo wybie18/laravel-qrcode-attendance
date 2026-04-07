@@ -55,7 +55,7 @@ class PersonnelsExport implements FromCollection, ShouldAutoSize, WithHeadings, 
             'office',
             'office_category',
             'position',
-            'qr_code'
+            'qr_code',
         ];
     }
 
